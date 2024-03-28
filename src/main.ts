@@ -32,7 +32,7 @@ async function bootstrap() {
     );
 
 
-    app.setGlobalPrefix('/v1');
+    // app.setGlobalPrefix('/v1');
     app.enableCors();
     // app.useGlobalGuards(new UserGuard(app.get(Reflector), configService));
     app.useGlobalPipes(new ValidationPipe({ transform: true }));

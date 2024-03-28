@@ -1,14 +1,15 @@
 import { Controller, Get } from "@nestjs/common";
 import { Payload } from "@nestjs/microservices";
 import { ZeebeWorker, ZeebeJob } from 'nestjs-zeebe';
-import { PruebasService } from "./prueba.service";
+import { ChorriService } from "./prueba.service";
+import { linkCourses, linkFirstCourse } from "./data";
 
 
 
 @Controller('pruebas')
 export class PruebasController {
     constructor(
-        private testService: PruebasService
+        private chorriService: ChorriService
     ){}
     
   
@@ -20,16 +21,14 @@ export class PruebasController {
 
     @Get('prueba')
     async response(): Promise<any> {
-        return await this.testService.greet();
+        return await this.chorriService.greet();
     }
 
     @ZeebeWorker('login')
     async firstJob(@Payload() job: ZeebeJob) {
         const { username, password, baseURL } = job.variables;
         
-        // console.log(username)
-        // console.log(password)
-        const waitLog = await this.testService.loginPage(username, password, baseURL);
+        const waitLog = await this.chorriService.loginPage(username, password, baseURL);
 
         await job.complete({
             isLogued: waitLog.isLogued,
@@ -37,6 +36,27 @@ export class PruebasController {
         });
     }
 
-    // @ZeebeWorker('')
+    @ZeebeWorker('courses')
+    async coursesJob(@Payload() job: ZeebeJob) {
+        const { username, password, baseURL, cookies } = job.variables;
+        
+        const coursesList = await this.chorriService.getCourses( baseURL, cookies)
+
+        linkFirstCourse // primer curso
+        // linkCourses // todos los cursos
+
+        await job.complete({
+            coursesList: coursesList
+        });
+    }
+
+    @ZeebeWorker('courseLessons')
+    async courseJob(@Payload() job: ZeebeJob){
+        const { course, cookies } = job.variables
+
+        const getLessons = await this.chorriService.getLessons( course, cookies )
+
+        await job.complete({})
+    }
 
 }

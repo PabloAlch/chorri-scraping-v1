@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
 import { PruebasController } from "./prueba.controller";
-import { PruebasService } from "./prueba.service";
+import { ChorriService } from "./prueba.service";
 
 
 @Module({
     controllers: [PruebasController],
-    providers: [PruebasService]
+    providers: [ChorriService]
 })
 
 export class PruebaModule {}
